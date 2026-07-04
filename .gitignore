@@ -1,0 +1,30 @@
+
+# Ignore the entire build directory where CMake generates Makefiles and object files
+build/
+
+# Ignore the final compiled executable
+TradingEngine
+*.exe
+*.out
+*.app
+
+
+# Ignore Python virtual environments
+venv/
+env/
+.venv/
+
+# Ignore compiled Python bytecode
+__pycache__/
+*.pyc
+
+# Ignore heavy Machine Learning models and datasets
+*.onnx
+*.csv
+*.dat
+
+# Other 
+.DS_Store
+.vscode/
+.idea/
+*.swp
