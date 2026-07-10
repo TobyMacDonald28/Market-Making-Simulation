@@ -9,10 +9,10 @@ OrderBook::OrderBook(double startingPrice) {
 void OrderBook::addOrder(Order order){
     if (order.isBuy) {
         bids[order.price].push_back(order);
-        orderLookup[order.orderId] = --bids[order.price].end();
+        orderLookup[order.orderId] = bids[order.price].end();
     } else {
         asks[order.price].push_back(order);
-        orderLookup[order.orderId] = --asks[order.price].end();
+        orderLookup[order.orderId] = asks[order.price].end();
     }
 }
 
@@ -35,4 +35,14 @@ void OrderBook::cancelOrder(int orderId){
     } else {
         std::cerr << "Order ID " << orderId << " not found for cancellation." << std::endl;
     }
+}
+
+void OrderBook::executeTradeBalances(const Order& buyerOrder, const Order& sellerOrder, double executionPrice, int quantity){
+    
+    traderAccounts[sellerOrder->botID].stockQuantity -= quantity
+    traderAccounts[sellerOrder->botID].balance += quantity * executionPrice
+    
+    traderAccounts[buyerOrder->botID].stockQuantity += quantity
+    traderAccounts[buyerOrder->botID].balance -= quantity * executionPrice
+    
 }
