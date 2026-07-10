@@ -9,7 +9,8 @@ find_package(Threads REQUIRED)
 
 add_executable(TradingEngine 
     cpp_engine/main.cpp 
-    cpp_engine/OrderBook.cpp
+    cpp_engine/order_book.cpp
+    cpp_engine/traders.cpp
 )
 
 target_link_libraries(TradingEngine Threads::Threads)
