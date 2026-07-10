@@ -2,8 +2,9 @@
 #include <iostream>
 
 OrderBook::OrderBook(double startingPrice) {
-    addOrder({0, 0, true, startingPrice, 0}); // Seed the order book with a starting price
+    addOrder({0, 0, true, startingPrice, 0});
 }
+
 
 void OrderBook::addOrder(Order order){
     if (order.isBuy) {
