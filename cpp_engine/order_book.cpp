@@ -13,7 +13,7 @@ void OrderBook::addOrder(Order order){
     if (order.isBuy) {
 
         while (!asks.empty() && asks.begin()->first <= order.price){
-            int executionPrice = asks.begin()->first;
+            double executionPrice = asks.begin()->first;
             if (asks.begin()->second.front().quantity < order.quantity) {
 
                 int quantity = asks.begin()->second.front().quantity;
@@ -43,7 +43,7 @@ void OrderBook::addOrder(Order order){
     } else {
 
         while (!bids.empty() && bids.rbegin()->first >= order.price){
-            int executionPrice = bids.rbegin()->first;
+            double executionPrice = bids.rbegin()->first;
             if (bids.rbegin()->second.front().quantity < order.quantity) {
 
                 int quantity = bids.rbegin()->second.front().quantity;
