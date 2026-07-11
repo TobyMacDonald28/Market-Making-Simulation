@@ -36,6 +36,8 @@ private:
     // All trader accounts mapped by botID encapsulating their accounts
     std::unordered_map<int, TraderAccount> traderAccounts;
 
+    std::mutex bookMutex;
+
     // helper function to execute trades 
     void executeTradeBalances(const Order& buyerOrder, const Order& sellerOrder, double executionPrice, int quantity);
 
