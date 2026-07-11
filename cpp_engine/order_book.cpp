@@ -8,11 +8,41 @@ OrderBook::OrderBook(double startingPrice) {
 
 void OrderBook::addOrder(Order order){
     if (order.isBuy) {
+
+        while (asks.begin()->price <= order.price){
+            int executionPrice = asks.begin()->price;
+            if (asks.begin()->quantity < order.quantity) {
+                int quantity = asks.begin()->quantity;
+                executeTradeBalances(order, *asks.begin(), executionPrice, quantity);
+                order.quantity -= quantity;
+            } else {
+                int quantity = order.quantity;
+                executeTradeBalances(order, *asks.begin(), executionPrice, quantity);
+                break;
+            }
+        }
+
         bids[order.price].push_back(order);
         orderLookup[order.orderId] = bids[order.price].end();
+
     } else {
+
+        while (bids.begin()->price >= order.price){
+            int executionPrice = bids.begin()->price;
+            if (bids.begin()->quantity < order.quantity) {
+                int quantity = bids.begin()->quantity;
+                executeTradeBalances(*bids.begin(), order, executionPrice, quantity);
+                order.quantity -= quantity;
+            } else {
+                int quantity = order.quantity;
+                executeTradeBalances(*bids.begin(), order, executionPrice, quantity);
+                // TODO: Need to free order ?
+                break;
+            }
+        }
         asks[order.price].push_back(order);
         orderLookup[order.orderId] = asks[order.price].end();
+
     }
 }
 
