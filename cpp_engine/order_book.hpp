@@ -26,7 +26,7 @@ struct TraderAccount {
 class OrderBook {
 private:
     
-    // Bids are sorted greatest to least using std::greater so the highest buy offer sits at the top
+    // Bids are sorted g,eatest to least using std::greater so the highest buy offer sits at the top
     std::map<double, std::list<Order>, std::greater<double>> bids;
     
     // Asks are sorted least to greatest by default so the cheapest sell offer sits at the top
@@ -43,12 +43,24 @@ private:
     // helper function to execute trades 
     void executeTradeBalances(const Order& buyerOrder, const Order& sellerOrder, double executionPrice, int quantity);
 
+    void internalCancelOrder(int orderId);
+
 
 public:
     OrderBook(double startingPrice);
     void addOrder(Order order);
     void cancelOrder(int orderId);
+    double getBestBid();
+    double getBestAsk();
 
+    // For testing purposes
+    TraderAccount& getAccount(int botId) {
+        return traderAccounts[botId];
+    }
+
+    TraderAccount getAccountCopy(int botId) {
+        return traderAccounts[botId];
+    }
 };
 
 #endif

@@ -14,3 +14,7 @@ add_executable(TradingEngine
 )
 
 target_link_libraries(TradingEngine Threads::Threads)
+
+add_executable(UnitTests cpp_engine/test_engine.cpp cpp_engine/order_book.cpp)
+
+target_link_libraries(UnitTests PRIVATE Threads::Threads)
