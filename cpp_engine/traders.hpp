@@ -15,6 +15,8 @@ public:
 
     virtual void makeDecision() = 0;
 
+    virtual void runLoop(std::atomic<bool>& running) = 0;
+
     int getID() const { return traderID; }
 
     double getCash() const { 
@@ -28,6 +30,8 @@ public:
     int getPosition() const { 
         return orderBook.getAccountCopy(traderID).stockQuantity; 
     }
+
+    
 };
 
 class MarketMaker : public Trader {
@@ -35,12 +39,14 @@ public:
     double spread = 0.5;
     MarketMaker(int id, OrderBook& ob, double spread) : Trader(id, ob), spread(spread) {}
     void makeDecision() override;
+    void runLoop(std::atomic<bool>& running) override;
 };
 
 class MomentumTrader : public Trader {
 public:
     MomentumTrader(int id, OrderBook& ob) : Trader(id, ob) {}
     void makeDecision() override;
+    void runLoop(std::atomic<bool>& running) override;
 };
 
 #endif

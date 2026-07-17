@@ -13,7 +13,9 @@ int main() {
     std::vector<std::thread> traderThreads;
 
     for (int i = 0; i < 5; ++i) {
-        traderThreads.emplace_back(MarketMakerLoop, std::ref(centralExchange), std::ref(running), i);
+        auto bot = new MarketMaker(i + 1, centralExchange, 0.05);
+
+        traderThreads.emplace_back(&MarketMaker::runLoop, bot, std::ref(running));
     }
 
     while (running) {

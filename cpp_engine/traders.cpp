@@ -8,5 +8,11 @@ void MarketMaker::makeDecision() {
     double sellPrice = midPrice + spread / 2.0;
     double currentBalance = getCash();
     double currentPosition = getPosition();
-    
+}
+
+void MarketMaker::runLoop(std::atomic<bool>& running) {
+    while (running.load()) {
+        makeDecision();
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 }
