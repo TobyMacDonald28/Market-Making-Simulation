@@ -9,6 +9,8 @@ private:
     OrderBook& orderBook; 
 
 public:
+    Trader(int id, OrderBook& ob) : traderID(id), orderBook(ob) {}
+
     virtual ~Trader() = default;
 
     virtual void makeDecision() = 0;
@@ -30,19 +32,14 @@ public:
 
 class MarketMaker : public Trader {
 public:
-    MarketMaker(int id, OrderBook& ob) : Trader(id, ob) {}
+    double spread = 0.5;
+    MarketMaker(int id, OrderBook& ob, double spread) : Trader(id, ob), spread(spread) {}
     void makeDecision() override;
 };
 
 class MomentumTrader : public Trader {
 public:
     MomentumTrader(int id, OrderBook& ob) : Trader(id, ob) {}
-    void makeDecision() override;
-};
-
-class MeanReversionTrader : public Trader {
-public:
-    MeanReversionTrader(int id, OrderBook& ob) : Trader(id, ob) {}
     void makeDecision() override;
 };
 

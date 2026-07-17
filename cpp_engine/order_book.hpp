@@ -45,6 +45,8 @@ private:
 
     void internalCancelOrder(int orderId);
 
+    std::atomic<long> nextOrderID{0};
+
 
 public:
     OrderBook(double startingPrice);
@@ -60,6 +62,10 @@ public:
 
     TraderAccount getAccountCopy(int botId) {
         return traderAccounts[botId];
+    }
+
+    long generateOrderID() {
+        return nextOrderID.fetch_add(1); 
     }
 };
 
