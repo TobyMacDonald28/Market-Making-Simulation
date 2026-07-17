@@ -4,11 +4,11 @@
 #include <thread>
 #include <vector>
 #include <atomic>
-#include "OrderBook.h" 
-#include "Trader.h"    
+#include "order_book.hpp" 
+#include "traders.hpp"    
 
 int main() {
-    OrderBook centralExchange;
+    OrderBook centralExchange = OrderBook(100.0);
     std::atomic<bool> running(true);
     std::vector<std::thread> traderThreads;
 

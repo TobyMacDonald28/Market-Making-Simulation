@@ -1,10 +1,11 @@
 #ifndef TRADERS_HPP
 #define TRADERS_HPP
-
-#include "OrderBook.hpp" 
+#include <thread>
+#include <chrono>
+#include "order_book.hpp" 
 
 class Trader {
-private:
+protected:
     int traderID;
     OrderBook& orderBook; 
 
