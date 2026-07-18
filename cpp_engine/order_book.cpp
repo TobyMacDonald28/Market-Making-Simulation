@@ -22,15 +22,11 @@ void OrderBook::internalCancelOrder(int orderId){
             }
         }
         orderLookup.erase(it);
-    } else {
-        std::cerr << "Order ID " << orderId << " not found for cancellation." << std::endl;
     }
 }
 
 
-void OrderBook::addOrder(Order order){
-
-    std::lock_guard<std::mutex> lock(bookMutex);
+void OrderBook::internalAddOrder(Order order){
 
     if (order.isBuy) {
 
@@ -52,7 +48,8 @@ void OrderBook::addOrder(Order order){
 
             if (quantity <= 0) {
                 std::cerr << "Insufficient Stock for botId " << orderIt.botId << " to execute trade " << std::endl;
-                return;
+                internalCancelOrder(orderIt.orderId);
+                continue;
             } 
 
             executeTradeBalances(order, asks.begin()->second.front(), executionPrice, quantity);
@@ -76,7 +73,7 @@ void OrderBook::addOrder(Order order){
             double executionPrice = bids.begin()->first;
             
                 
-            auto orderIt = bids.begin()->second.front();
+            Order& orderIt = bids.begin()->second.front();
 
             double maxAffordable = (executionPrice > 0) ? (traderAccounts[orderIt.botId].balance / executionPrice) : 0;
 
@@ -84,7 +81,8 @@ void OrderBook::addOrder(Order order){
 
             if (quantity <= 0) {
                 std::cerr << "Insufficient funds for botId " << orderIt.botId << " to execute trade at price " << executionPrice << std::endl;
-                return;
+                internalCancelOrder(orderIt.orderId);
+                continue;
             }
 
             quantity = std::min({quantity, traderAccounts[order.botId].stockQuantity});
@@ -93,7 +91,6 @@ void OrderBook::addOrder(Order order){
                 std::cerr << "Insufficient Stock for botId " << order.botId << " to execute trade " << std::endl;
                 return;
             } 
-
 
             executeTradeBalances(order, bids.begin()->second.front(), executionPrice, quantity);
             
@@ -105,12 +102,17 @@ void OrderBook::addOrder(Order order){
             }
         
         }
-    
+
         if (order.quantity > 0) {
             asks[order.price].push_back(order);
             orderLookup[order.orderId] = --asks[order.price].end();
         }
     }
+}
+
+void OrderBook::addOrder(Order order){
+    std::lock_guard<std::mutex> lock(bookMutex);
+    internalAddOrder(order);
 }
 
 void OrderBook::cancelOrder(int orderId){
@@ -141,5 +143,5 @@ double OrderBook::getBestAsk() {
 void OrderBook::replaceOrder(int orderId, Order newOrder) {
     std::lock_guard<std::mutex> lock(bookMutex);
     internalCancelOrder(orderId);
-    addOrder(newOrder);
+    internalAddOrder(newOrder);
 }

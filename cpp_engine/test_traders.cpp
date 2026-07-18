@@ -27,6 +27,7 @@ void testInitialQuotes() {
     // Because 99.50 > 99.0 (dummy bid), the bot should now be the Best Bid.
     // Because 100.50 < 101.0 (dummy ask), the bot should now be the Best Ask.
     assert(ob.getBestBid() == 99.50);
+    std::cout << "[PASS] testInitialQuotes: Best Bid is correct.\n";
     assert(ob.getBestAsk() == 100.50);
 
     std::cout << "[PASS] testInitialQuotes: Spread calculated and injected correctly.\n";

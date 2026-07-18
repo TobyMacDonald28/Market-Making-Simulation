@@ -20,7 +20,7 @@ struct Order {
 struct TraderAccount {
     int botId;
     double balance = 10000;
-    int stockQuantity = 0;
+    int stockQuantity = 100;
 };
 
 class OrderBook {
@@ -44,6 +44,8 @@ private:
     void executeTradeBalances(const Order& buyerOrder, const Order& sellerOrder, double executionPrice, int quantity);
 
     void internalCancelOrder(int orderId);
+
+    void internalAddOrder(Order order);
 
     std::atomic<long> nextOrderID{0};
 
