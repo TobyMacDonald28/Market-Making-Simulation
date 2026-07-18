@@ -2,6 +2,8 @@
 #define TRADERS_HPP
 #include <thread>
 #include <chrono>
+#include <iostream>
+#include <pybind11/embed.h>
 #include "order_book.hpp" 
 
 class Trader {
@@ -47,7 +49,10 @@ public:
 
 class MomentumTrader : public Trader {
 public:
-    MomentumTrader(int id, OrderBook& ob) : Trader(id, ob) {}
+    MomentumTrader(int id, OrderBook& ob) : Trader(id, ob) {
+        py::module_ mod = py::module_::import("momentum_strategy");
+        py_bot = mod.attr("MomentumTrader")();
+    }
     void makeDecision() override;
     void runLoop(std::atomic<bool>& running) override;
 };
