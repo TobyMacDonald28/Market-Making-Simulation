@@ -54,6 +54,7 @@ public:
     void cancelOrder(int orderId);
     double getBestBid();
     double getBestAsk();
+    void replaceOrder(int orderId, Order newOrder);
 
     // For testing purposes
     TraderAccount& getAccount(int botId) {

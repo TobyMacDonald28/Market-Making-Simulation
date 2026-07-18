@@ -8,6 +8,8 @@ class Trader {
 protected:
     int traderID;
     OrderBook& orderBook; 
+    int prevBidId = -1;
+    int prevAskId = -1;
 
 public:
     Trader(int id, OrderBook& ob) : traderID(id), orderBook(ob) {}
