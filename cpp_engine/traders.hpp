@@ -3,8 +3,11 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <pybind11/pybind11.h>
 #include <pybind11/embed.h>
-#include "order_book.hpp" 
+#include "order_book.hpp"
+namespace py = pybind11;
+
 
 class Trader {
 protected:
@@ -21,6 +24,10 @@ public:
     virtual void makeDecision() = 0;
 
     virtual void runLoop(std::atomic<bool>& running) = 0;
+
+    void tick() {
+        makeDecision();
+    }
 
     int getID() const { return traderID; }
 
@@ -48,9 +55,12 @@ public:
 };
 
 class MomentumTrader : public Trader {
+    py::object py_bot; 
 public:
     MomentumTrader(int id, OrderBook& ob) : Trader(id, ob) {
-        py::module_ mod = py::module_::import("momentum_strategy");
+        py::module_ sys = py::module_::import("sys");
+        sys.attr("path").attr("append")("../python_brain");
+        py::module_ mod = py::module_::import("traders");        
         py_bot = mod.attr("MomentumTrader")();
     }
     void makeDecision() override;

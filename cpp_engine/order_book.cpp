@@ -145,3 +145,20 @@ void OrderBook::replaceOrder(int orderId, Order newOrder) {
     internalCancelOrder(orderId);
     internalAddOrder(newOrder);
 }
+
+void OrderBook::displayBook() {
+    std::lock_guard<std::mutex> lock(bookMutex);
+    std::cout << "Order Book:\n";
+    std::cout << "Bids:\n";
+    for (const auto& [price, orders] : bids) {
+        for (const auto& order : orders) {
+            std::cout << "Price: " << price << ", Quantity: " << order.quantity << ", Bot ID: " << order.botId << "\n";
+        }
+    }
+    std::cout << "Asks:\n";
+    for (const auto& [price, orders] : asks) {
+        for (const auto& order : orders) {
+            std::cout << "Price: " << price << ", Quantity: " << order.quantity << ", Bot ID: " << order.botId << "\n";
+        }
+    }
+}

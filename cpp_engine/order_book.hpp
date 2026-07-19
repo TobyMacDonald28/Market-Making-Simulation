@@ -70,6 +70,8 @@ public:
     long generateOrderID() {
         return nextOrderID.fetch_add(1); 
     }
+
+    void displayBook();
 };
 
 #endif

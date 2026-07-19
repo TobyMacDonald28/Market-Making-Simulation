@@ -8,33 +8,72 @@
 #include "traders.hpp"    
 
 int main() {
-    OrderBook centralExchange = OrderBook(100.0);
+
+    py::scoped_interpreter guard{};
+
+    /*
+    OrderBook centralExchange(100.0);
     std::atomic<bool> running(true);
     std::vector<std::thread> traderThreads;
+    std::vector<std::unique_ptr<Trader>> bots;
 
     for (int i = 0; i < 5; ++i) {
-        auto bot = new MarketMaker(i + 1, centralExchange, 0.05);
+        bots.push_back(std::make_unique<MarketMaker>(i + 1, centralExchange, 0.05));
+    }
+    for (int i = 5; i < 10; ++i) {
+        bots.push_back(std::make_unique<MomentumTrader>(i + 1, centralExchange));
+    }
 
-        traderThreads.emplace_back(&MarketMaker::runLoop, bot, std::ref(running));
+    for (auto& bot : bots) {
+        traderThreads.emplace_back([&bot, &running]() {
+            bot->runLoop(std::ref(running));
+        });
     }
 
     while (running) {
-        std::cout << "\n--- Trading Engine Running ---" << std::endl;
-        std::cout << "Type 'exit' to shut down: ";
         std::string command;
+        std::cout << "\n[p] Print Book, [exit] Quit: ";
         std::cin >> command;
 
-        if (command == "exit") {
+        if (command == "p") {
+             centralExchange.displayBook();
+        } else if (command == "exit") {
             running = false; 
         }
     }
 
-    for (auto& t : traderThreads) {
-        if (t.joinable()) {
-            t.join();
+    std::cout << "Shutting down trader threads..." << std::endl;
+    for (auto& thread : traderThreads) {
+        if (thread.joinable()) {
+            thread.join();
         }
     }
-
-    std::cout << "Engine shut down cleanly." << std::endl;
+    std::cout << "All threads joined. Exiting." << std::endl;
     return 0;
+*/
+
+    OrderBook centralExchange(100.0);
+    std::vector<std::unique_ptr<Trader>> bots;
+
+    bots.push_back(std::make_unique<MarketMaker>(1, centralExchange, 0.05));
+    bots.push_back(std::make_unique<MomentumTrader>(2, centralExchange));
+
+    std::string command;
+    while (true) {
+        std::cout << "\n[t] Tick, [exit] Quit: ";
+        std::cin >> command;
+
+        if (command == "t") {
+            for (auto& bot : bots) {
+                bot->tick();
+            }
+            std::cout << "Current Order Book:\n";
+            centralExchange.displayBook();
+            std::cout << "Simulation ticked." << std::endl;
+        } else if (command == "exit") {
+            break;
+        }
+    }
+    return 0;
+
 }
