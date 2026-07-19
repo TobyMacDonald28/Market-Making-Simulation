@@ -10,8 +10,6 @@
 int main() {
 
     py::scoped_interpreter guard{};
-
-    PyEval_SaveThread();   
     
     OrderBook centralExchange(100.0);
     std::atomic<bool> running(true);
@@ -21,9 +19,13 @@ int main() {
     for (int i = 0; i < 3; ++i) {
         bots.push_back(std::make_unique<MarketMaker>(i + 1, centralExchange, 0.05));
     }
-    for (int i = 3; i < 6; ++i) {
+    for (int i = 3; i < 9; ++i) {
         bots.push_back(std::make_unique<MomentumTrader>(i + 1, centralExchange));
     }
+    for (int i = 9; i < 40; ++i) {
+        bots.push_back(std::make_unique<RandomTrader>(i + 1, centralExchange));
+    }
+    py::gil_scoped_release release;
 
 
     for (auto& bot : bots) {
