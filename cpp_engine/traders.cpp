@@ -22,22 +22,25 @@ void MarketMaker::makeDecision() {
     }
 }
 
-void MarketMaker::runLoop(std::atomic<bool>& running) {
-    while (running.load()) {
-        makeDecision();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
-}
-
 void MomentumTrader::makeDecision() {
     double bestBid = orderBook.getBestBid();
     double bestAsk = orderBook.getBestAsk();
     
+    std::string action;
+    try {
+        {
+            py::gil_scoped_acquire gil;
 
-    {
-        py::gil_scoped_acquire acquire;
-        std::string action = py_bot.attr("make_decision")(bestBid, bestAsk).cast<std::string>();
-        py::gil_scoped_release release;
+            action = py_bot.attr("make_decision")(bestBid, bestAsk)
+                         .cast<std::string>();
+        }
+    }
+    catch (const py::error_already_set& e) {
+        std::cerr << "Python error in trader "
+                  << traderID << ": "
+                  << e.what() << std::endl;
+        return;
+    }
         
         double buyPrice = bestBid - 0.5;
         double sellPrice = bestAsk + 0.5;
@@ -61,12 +64,43 @@ void MomentumTrader::makeDecision() {
             orderBook.replaceOrder(prevAskId, newSellOrder);
             prevAskId = newSellOrder.orderId;
         }
-    }
+    
 }
 
-void MomentumTrader::runLoop(std::atomic<bool>& running) {
-    while (running) {
-        makeDecision();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+void RandomTrader::makeDecision() {
+    double bestBid = orderBook.getBestBid();
+    double bestAsk = orderBook.getBestAsk();
+    if (bestBid <= 0 || bestAsk <= 0 || bestBid >= bestAsk) return; 
+
+    int action       = actionDist(gen);
+    double offset    = priceOffsetDist(gen);
+    double sizeRatio = sizeDist(gen); 
+
+    double midPrice = (bestBid + bestAsk) / 2.0;
+
+    if (action == 0) { 
+        double buyPrice = midPrice + offset;
+        
+        int maxAffordable = static_cast<int>(getCash() / buyPrice);
+        int buyQuantity = static_cast<int>(maxAffordable * sizeRatio);
+        
+        if (buyQuantity > 0) {
+            Order newOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, true, buyPrice, buyQuantity};
+            if (prevOrderId == 0) orderBook.addOrder(newOrder);
+            else orderBook.replaceOrder(prevOrderId, newOrder);
+            prevOrderId = newOrder.orderId;
+        }
+
+    } else { 
+        double sellPrice = midPrice - offset;
+        
+        int sellQuantity = static_cast<int>(getPosition() * sizeRatio); 
+        
+        if (sellQuantity > 0) { 
+            Order newOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, false, sellPrice, sellQuantity};
+            if (prevOrderId == 0) orderBook.addOrder(newOrder);
+            else orderBook.replaceOrder(prevOrderId, newOrder);
+            prevOrderId = newOrder.orderId; 
+        }
     }
 }

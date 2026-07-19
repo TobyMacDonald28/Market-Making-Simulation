@@ -6,6 +6,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/embed.h>
 #include "order_book.hpp"
+#include <random>
 namespace py = pybind11;
 
 
@@ -23,7 +24,12 @@ public:
 
     virtual void makeDecision() = 0;
 
-    virtual void runLoop(std::atomic<bool>& running) = 0;
+    virtual void runLoop(std::atomic<bool>& running) {
+        while (running.load()) {
+            makeDecision();
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
 
     void tick() {
         makeDecision();
@@ -51,7 +57,6 @@ public:
     double spread = 0.5;
     MarketMaker(int id, OrderBook& ob, double spread) : Trader(id, ob), spread(spread) {}
     void makeDecision() override;
-    void runLoop(std::atomic<bool>& running) override;
 };
 
 class MomentumTrader : public Trader {
@@ -64,7 +69,24 @@ public:
         py_bot = mod.attr("MomentumTrader")();
     }
     void makeDecision() override;
-    void runLoop(std::atomic<bool>& running) override;
+};
+
+class RandomTrader : public Trader {
+private:
+    std::mt19937 gen;
+    
+    std::uniform_int_distribution<> actionDist;
+    
+    std::uniform_real_distribution<> priceOffsetDist;
+    
+    std::uniform_real_distribution<> sizeDist; 
+    
+    int prevOrderId; 
+
+public:
+    RandomTrader(int id, OrderBook& ob): Trader(id, ob), gen(std::random_device{}()), actionDist(0, 1), priceOffsetDist(0.1, 5.0), sizeDist(0.1, 10.0), prevOrderId(-1) {};
+    void makeDecision() override;
+    
 };
 
 #endif

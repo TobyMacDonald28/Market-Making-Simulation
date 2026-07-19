@@ -99,6 +99,7 @@ void OrderBook::internalAddOrder(Order order){
 
             if (orderIt.quantity == 0) {
                 internalCancelOrder(orderIt.orderId);
+                std::cout << "Order fully executed and removed from bids: Price: " << executionPrice << ", Bot ID: " << orderIt.botId << std::endl;
             }
         
         }
@@ -124,9 +125,13 @@ void OrderBook::executeTradeBalances(const Order& buyerOrder, const Order& selle
 
     traderAccounts[sellerOrder.botId].stockQuantity -= quantity;
     traderAccounts[sellerOrder.botId].balance += quantity * executionPrice;
+    std::cout << "Trade executed: Buyer Bot ID: " << buyerOrder.botId << ", Seller Bot ID: " << sellerOrder.botId 
+              << ", Price: " << executionPrice << ", Quantity: " << quantity << std::endl;
     
     traderAccounts[buyerOrder.botId].stockQuantity += quantity;
     traderAccounts[buyerOrder.botId].balance -= quantity * executionPrice;
+    std::cout << "Trade executed: Buyer Bot ID: " << buyerOrder.botId << ", Seller Bot ID: " << sellerOrder.botId 
+              << ", Price: " << executionPrice << ", Quantity: " << quantity << std::endl;
     
 }
 

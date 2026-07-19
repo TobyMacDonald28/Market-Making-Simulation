@@ -11,18 +11,20 @@ int main() {
 
     py::scoped_interpreter guard{};
 
-    /*
+    PyEval_SaveThread();   
+    
     OrderBook centralExchange(100.0);
     std::atomic<bool> running(true);
     std::vector<std::thread> traderThreads;
     std::vector<std::unique_ptr<Trader>> bots;
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 3; ++i) {
         bots.push_back(std::make_unique<MarketMaker>(i + 1, centralExchange, 0.05));
     }
-    for (int i = 5; i < 10; ++i) {
+    for (int i = 3; i < 6; ++i) {
         bots.push_back(std::make_unique<MomentumTrader>(i + 1, centralExchange));
     }
+
 
     for (auto& bot : bots) {
         traderThreads.emplace_back([&bot, &running]() {
@@ -50,7 +52,7 @@ int main() {
     }
     std::cout << "All threads joined. Exiting." << std::endl;
     return 0;
-*/
+/*
 
     OrderBook centralExchange(100.0);
     std::vector<std::unique_ptr<Trader>> bots;
@@ -75,5 +77,6 @@ int main() {
         }
     }
     return 0;
+    */
 
 }

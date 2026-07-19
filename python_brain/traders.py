@@ -15,3 +15,4 @@ class MomentumTrader:
                 return "SELL"
         
         return "HOLD"
+    
