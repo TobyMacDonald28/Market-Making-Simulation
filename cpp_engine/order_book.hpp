@@ -72,6 +72,22 @@ public:
     }
 
     void displayBook();
+
+    MarketState getMarketState(int botId) {
+        MarketState state;
+        state.bestBid = getBestBid();
+        state.bestAsk = getBestAsk();
+        state.bestBidQuantity = getBestBidQuantity();
+        state.bestAskQuantity = getBestAskQuantity();
+        return state;
+    }
+};
+
+struct MarketState {
+    double bestBid;
+    double bestAsk;
+    int bestBidQuantity;
+    double bestAskQuantity;
 };
 
 #endif

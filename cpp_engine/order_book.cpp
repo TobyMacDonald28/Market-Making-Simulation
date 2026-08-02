@@ -145,6 +145,16 @@ double OrderBook::getBestAsk() {
     return asks.empty() ? 999999.0 : asks.begin()->first; 
 }
 
+double OrderBook::getBestBidQuantity() { 
+    std::lock_guard<std::mutex> lock(bookMutex);
+    return bids.empty() ? 0 : bids.begin()->second.front().quantity; 
+}
+
+double OrderBook::getBestAskQuantity() { 
+    std::lock_guard<std::mutex> lock(bookMutex);
+    return asks.empty() ? 0 : asks.begin()->second.front().quantity; 
+}
+
 void OrderBook::replaceOrder(int orderId, Order newOrder) {
     std::lock_guard<std::mutex> lock(bookMutex);
     internalCancelOrder(orderId);
