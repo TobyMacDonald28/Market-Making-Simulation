@@ -1,16 +1,20 @@
 #include <iostream>
-
-#include <iostream>
 #include <thread>
 #include <vector>
 #include <atomic>
-#include "order_book.hpp" 
-#include "traders.hpp"    
+#include <memory>
+
+#include <pybind11/embed.h>
+
+#include "order_book.hpp"
+#include "traders.hpp"
+#include "agentic_trader_bot.hpp"
+
+namespace py = pybind11;
 
 int main() {
+    py::scoped_interpreter guard{};  // starts embedded Python and holds the GIL on this thread
 
-    py::scoped_interpreter guard{};
-    
     OrderBook centralExchange(100.0);
     std::atomic<bool> running(true);
     std::vector<std::thread> traderThreads;
@@ -25,8 +29,17 @@ int main() {
     for (int i = 9; i < 40; ++i) {
         bots.push_back(std::make_unique<RandomTrader>(i + 1, centralExchange));
     }
-    py::gil_scoped_release release;
 
+
+    constexpr int NUM_AGENTIC_BOTS = 1;
+    std::vector<AgenticTraderBot*> agenticBots;  
+    for (int i = 40; i < 40 + NUM_AGENTIC_BOTS; ++i) {
+        auto bot = std::make_unique<AgenticTraderBot>(i, centralExchange);
+        agenticBots.push_back(bot.get());
+        bots.push_back(std::move(bot));
+    }
+
+    py::gil_scoped_release release; 
 
     for (auto& bot : bots) {
         traderThreads.emplace_back([&bot, &running]() {
@@ -36,13 +49,17 @@ int main() {
 
     while (running) {
         std::string command;
-        std::cout << "\n[p] Print Book, [exit] Quit: ";
+        std::cout << "\n[p] Print Book, [a] Agentic bot status, [exit] Quit: ";
         std::cin >> command;
 
         if (command == "p") {
-             centralExchange.displayBook();
+            centralExchange.displayBook();
+        } else if (command == "a") {
+            for (auto* bot : agenticBots) {
+                std::cout << bot->lastStatus() << std::endl;
+            }
         } else if (command == "exit") {
-            running = false; 
+            running = false;
         }
     }
 
@@ -54,31 +71,4 @@ int main() {
     }
     std::cout << "All threads joined. Exiting." << std::endl;
     return 0;
-/*
-
-    OrderBook centralExchange(100.0);
-    std::vector<std::unique_ptr<Trader>> bots;
-
-    bots.push_back(std::make_unique<MarketMaker>(1, centralExchange, 0.05));
-    bots.push_back(std::make_unique<MomentumTrader>(2, centralExchange));
-
-    std::string command;
-    while (true) {
-        std::cout << "\n[t] Tick, [exit] Quit: ";
-        std::cin >> command;
-
-        if (command == "t") {
-            for (auto& bot : bots) {
-                bot->tick();
-            }
-            std::cout << "Current Order Book:\n";
-            centralExchange.displayBook();
-            std::cout << "Simulation ticked." << std::endl;
-        } else if (command == "exit") {
-            break;
-        }
-    }
-    return 0;
-    */
-
 }

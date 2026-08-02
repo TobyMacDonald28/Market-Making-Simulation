@@ -81,6 +81,16 @@ public:
         state.bestAskQuantity = getBestAskQuantity();
         return state;
     }
+
+    Order getOrder(int orderId) {
+        std::lock_guard<std::mutex> lock(bookMutex);
+        auto it = orderLookup.find(orderId);
+        if (it != orderLookup.end()) {
+            return *(it->second);
+        } else {
+            throw std::runtime_error("Order ID not found");
+        }
+    }
 };
 
 struct MarketState {

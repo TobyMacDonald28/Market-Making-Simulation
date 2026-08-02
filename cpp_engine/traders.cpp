@@ -86,9 +86,9 @@ void RandomTrader::makeDecision() {
         
         if (buyQuantity > 0) {
             Order newOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, true, buyPrice, buyQuantity};
-            if (prevOrderId == 0) orderBook.addOrder(newOrder);
-            else orderBook.replaceOrder(prevOrderId, newOrder);
-            prevOrderId = newOrder.orderId;
+            if (prevBidId == -1) orderBook.addOrder(newOrder);
+            else orderBook.replaceOrder(prevBidId, newOrder);
+            prevBidId = newOrder.orderId;
         }
 
     } else { 
@@ -98,9 +98,9 @@ void RandomTrader::makeDecision() {
         
         if (sellQuantity > 0) { 
             Order newOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, false, sellPrice, sellQuantity};
-            if (prevOrderId == 0) orderBook.addOrder(newOrder);
-            else orderBook.replaceOrder(prevOrderId, newOrder);
-            prevOrderId = newOrder.orderId; 
+            if (prevAskId == -1) orderBook.addOrder(newOrder);
+            else orderBook.replaceOrder(prevAskId, newOrder);
+            prevAskId = newOrder.orderId; 
         }
     }
 }
@@ -146,4 +146,18 @@ void AgenticTrader::makeDecision() {
             prevAskId = newSellOrder.orderId;
         }
     
+}
+
+string AgenticTraderBot::lastStatus() {
+    MarketState marketState = orderBook.getMarketState(traderID);
+    double cashBalance = getCash();
+    int currentPosition = getPosition();
+    string status;
+    status += "Bot ID: " + std::to_string(traderID) + "\n";
+    status += "Cash Balance: " + std::to_string(cashBalance) + "\n";
+    status += "Current Position: " + std::to_string(currentPosition) + "\n";
+    status += "Previous Bid: " + std::to_string(getOrder(prevBidId).price) + " (Quantity: " + std::to_string(getOrder(prevBidId).quantity) + ")\n";
+    status += "Previous Ask: " + std::to_string(getOrder(prevAskId).price) + " (Quantity: " + std::to_string(getOrder(prevAskId).quantity) + ")\n";
+
+    return status;
 }
