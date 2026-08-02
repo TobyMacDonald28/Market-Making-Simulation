@@ -104,3 +104,46 @@ void RandomTrader::makeDecision() {
         }
     }
 }
+
+void AgenticTrader::makeDecision() {
+    MarketState marketState = orderBook.getMarketState(traderID);
+    double cashBalance = getCash();
+    int currentPosition = getPosition();
+    
+    std::string action;
+    try {
+        {
+            py::gil_scoped_acquire gil;
+
+            action = py_bot.attr("make_decision")(marketState, cashBalance, currentPosition);
+            std::string action = py_signal.attr("decision").cast<std::string>();
+            int quantity = py_signal.attr("quantity").cast<int>();
+        }
+    }
+    catch (const py::error_already_set& e) {
+        std::cerr << "Python error in trader "
+                  << traderID << ": "
+                  << e.what() << std::endl;
+        return;
+    }
+        
+
+        if (action == "BUY") {
+            if (quantity <= 0) {
+                std::cout << "[INFO] AgenticTrader " << traderID << " cannot afford to buy.\n";
+                return;
+            }
+            Order newBuyOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, true, buyPrice, buyQuantity};
+            orderBook.replaceOrder(prevBidId, newBuyOrder);
+            prevBidId = newBuyOrder.orderId;
+        } else if (action == "SELL") {
+            if (quantity <= 0) {
+                std::cout << "[INFO] AgenticTrader " << traderID << " has no stock to sell.\n";
+                return;
+            }
+            Order newSellOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, false, sellPrice, sellQuantity};
+            orderBook.replaceOrder(prevAskId, newSellOrder);
+            prevAskId = newSellOrder.orderId;
+        }
+    
+}

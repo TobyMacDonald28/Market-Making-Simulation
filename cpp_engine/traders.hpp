@@ -98,4 +98,15 @@ public:
     
 };
 
+class AgenticTrader : public Trader {
+private:
+    py::object py_bot;
+public:
+    AgenticTrader(int id, OrderBook& ob) : Trader(id, ob) {
+        py::module_ sys = py::module_::import("sys");
+        sys.attr("path").attr("append")("../python_brain");
+        py::module_ mod = py::module_::import("traders");
+        py_bot = mod.attr("AgenticTrader")();
+    }
+}
 #endif
