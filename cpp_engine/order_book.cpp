@@ -41,13 +41,11 @@ void OrderBook::internalAddOrder(Order order){
             int quantity = std::min({order.quantity, orderIt.quantity, (int)maxAffordable});
             
             if (quantity <= 0) {
-                std::cerr << "Insufficient funds for botId " << order.botId << " to execute trade at price " << executionPrice << std::endl;
                 return;
             } 
             quantity = std::min({quantity, traderAccounts[orderIt.botId].stockQuantity});
 
             if (quantity <= 0) {
-                std::cerr << "Insufficient Stock for botId " << orderIt.botId << " to execute trade " << std::endl;
                 internalCancelOrder(orderIt.orderId);
                 continue;
             } 
@@ -80,7 +78,6 @@ void OrderBook::internalAddOrder(Order order){
             int quantity = std::min({order.quantity, orderIt.quantity, (int)maxAffordable});
 
             if (quantity <= 0) {
-                std::cerr << "Insufficient funds for botId " << orderIt.botId << " to execute trade at price " << executionPrice << std::endl;
                 internalCancelOrder(orderIt.orderId);
                 continue;
             }
@@ -88,7 +85,6 @@ void OrderBook::internalAddOrder(Order order){
             quantity = std::min({quantity, traderAccounts[order.botId].stockQuantity});
             
             if (quantity <= 0) {
-                std::cerr << "Insufficient Stock for botId " << order.botId << " to execute trade " << std::endl;
                 return;
             } 
 
@@ -99,7 +95,6 @@ void OrderBook::internalAddOrder(Order order){
 
             if (orderIt.quantity == 0) {
                 internalCancelOrder(orderIt.orderId);
-                std::cout << "Order fully executed and removed from bids: Price: " << executionPrice << ", Bot ID: " << orderIt.botId << std::endl;
             }
         
         }
@@ -125,13 +120,9 @@ void OrderBook::executeTradeBalances(const Order& buyerOrder, const Order& selle
 
     traderAccounts[sellerOrder.botId].stockQuantity -= quantity;
     traderAccounts[sellerOrder.botId].balance += quantity * executionPrice;
-    std::cout << "Trade executed: Buyer Bot ID: " << buyerOrder.botId << ", Seller Bot ID: " << sellerOrder.botId 
-              << ", Price: " << executionPrice << ", Quantity: " << quantity << std::endl;
     
     traderAccounts[buyerOrder.botId].stockQuantity += quantity;
     traderAccounts[buyerOrder.botId].balance -= quantity * executionPrice;
-    std::cout << "Trade executed: Buyer Bot ID: " << buyerOrder.botId << ", Seller Bot ID: " << sellerOrder.botId 
-              << ", Price: " << executionPrice << ", Quantity: " << quantity << std::endl;
     
 }
 

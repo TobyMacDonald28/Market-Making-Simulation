@@ -1,5 +1,9 @@
 from collections import deque
-from dotenv import load_dotenv
+import sys
+from dotenv import load_dotenv, find_dotenv
+print("Looking for .env at:", find_dotenv())
+load_dotenv()
+
 import os
 import pandas as pd
 from groq import Groq
@@ -8,9 +12,7 @@ from typing import Literal
 import numpy as np
 import json
 import engine_backend
- 
-load_dotenv()
- 
+  
 client = Groq(
     api_key=os.environ["GROQ_API_KEY"]
 )
@@ -50,7 +52,7 @@ class AgenticTrader:
         self.tick_history.append(market_state)
  
         if len(self.tick_history) < self.lookback_window:
-            return Decision(decision="HOLD", quantity=0)
+            return Decision(decision="HOLD", price = 0, quantity=0)
  
         df = pd.DataFrame(self.tick_history)
  

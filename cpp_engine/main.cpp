@@ -14,6 +14,10 @@ namespace py = pybind11;
 int main() {
     py::scoped_interpreter guard{};  // starts embedded Python and holds the GIL on this thread
 
+    py::module_ sys = py::module_::import("sys");
+    sys.attr("path").attr("insert")(0, "/Users/tobymacdonald/Documents/Market-Making-Simulation/venv/lib/python3.14/site-packages");
+
+
     OrderBook centralExchange(100.0);
     std::atomic<bool> running(true);
     std::vector<std::thread> traderThreads;

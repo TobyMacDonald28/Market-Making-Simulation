@@ -49,7 +49,6 @@ void MomentumTrader::makeDecision() {
 
         if (action == "BUY") {
             if (buyQuantity <= 0) {
-                std::cout << "[INFO] MomentumTrader " << traderID << " cannot afford to buy.\n";
                 return;
             }
             Order newBuyOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, true, buyPrice, buyQuantity};
@@ -57,7 +56,6 @@ void MomentumTrader::makeDecision() {
             prevBidId = newBuyOrder.orderId;
         } else if (action == "SELL") {
             if (sellQuantity <= 0) {
-                std::cout << "[INFO] MomentumTrader " << traderID << " has no stock to sell.\n";
                 return;
             }
             Order newSellOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, false, sellPrice, sellQuantity};
@@ -134,7 +132,6 @@ void AgenticTrader::makeDecision() {
 
         if (decision == "BUY") {
             if (quantity <= 0) {
-                std::cout << "[INFO] AgenticTrader " << traderID << " cannot afford to buy.\n";
                 return;
             }
             Order newBuyOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, true, price, quantity};
@@ -142,7 +139,6 @@ void AgenticTrader::makeDecision() {
             prevBidId = newBuyOrder.orderId;
         } else if (decision == "SELL") {
             if (quantity <= 0) {
-                std::cout << "[INFO] AgenticTrader " << traderID << " has no stock to sell.\n";
                 return;
             }
             Order newSellOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, false, price, quantity};

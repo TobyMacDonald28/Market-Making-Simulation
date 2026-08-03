@@ -28,12 +28,9 @@ target_link_libraries(TradingEngine PRIVATE
     ${Python3_LIBRARIES}
 )
 
-add_library(engine_backend MODULE cpp_engine/bindings.cpp)
-target_include_directories(engine_backend PRIVATE ${Python3_INCLUDE_DIRS})
-target_link_libraries(engine_backend PRIVATE 
-    pybind11::headers 
-    ${Python3_LIBRARIES}
-)
+pybind11_add_module(engine_backend cpp_engine/bindings.cpp)
+
+
 add_executable(OrderBookTests cpp_engine/test_engine.cpp cpp_engine/order_book.cpp)
 target_link_libraries(OrderBookTests PRIVATE Threads::Threads)
 
