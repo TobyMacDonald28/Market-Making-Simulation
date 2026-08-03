@@ -70,10 +70,12 @@ public:
 
     // For testing purposes
     TraderAccount& getAccount(int botId) {
+        std::lock_guard<std::mutex> lock(bookMutex);
         return traderAccounts[botId];
     }
 
     TraderAccount getAccountCopy(int botId) {
+        std::lock_guard<std::mutex> lock(bookMutex);
         return traderAccounts[botId];
     }
 
@@ -84,6 +86,7 @@ public:
     void displayBook();
 
     MarketState getMarketState(int botId) {
+        std::lock_guard<std::mutex> lock(bookMutex);
         MarketState state;
         state.bestBid = getBestBid();
         state.bestAsk = getBestAsk();

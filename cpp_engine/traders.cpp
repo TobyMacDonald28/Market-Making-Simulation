@@ -117,9 +117,9 @@ void AgenticTrader::makeDecision() {
             py::gil_scoped_acquire gil;
 
             py::object py_signal = py_bot.attr("make_decision")(marketState, cashBalance, currentPosition);
-            std::string decision = py_signal.attr("decision").cast<std::string>();
-            double price = py_signal.attr("price").cast<double>();
-            int quantity = py_signal.attr("quantity").cast<int>();
+            decision = py_signal.attr("decision").cast<std::string>();
+            price = py_signal.attr("price").cast<double>();
+            quantity = py_signal.attr("quantity").cast<int>();
         }
     }
     catch (const py::error_already_set& e) {
