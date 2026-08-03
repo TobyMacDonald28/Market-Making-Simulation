@@ -12,6 +12,8 @@ TradingEngine
 # Ignore Python virtual environments
 venv/
 env/
+env.txt
+env
 .venv/
 
 # Ignore compiled Python bytecode

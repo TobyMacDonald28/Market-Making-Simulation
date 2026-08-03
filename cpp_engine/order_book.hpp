@@ -8,6 +8,14 @@
 #include <string>
 #include <unordered_map>
 
+
+struct MarketState {
+    double bestBid;
+    double bestAsk;
+    int bestBidQuantity;
+    double bestAskQuantity;
+};
+
 // Order Data Layout Struct
 struct Order {
     int orderId;    
@@ -56,6 +64,8 @@ public:
     void cancelOrder(int orderId);
     double getBestBid();
     double getBestAsk();
+    double getBestBidQuantity();
+    double getBestAskQuantity();
     void replaceOrder(int orderId, Order newOrder);
 
     // For testing purposes
@@ -93,11 +103,5 @@ public:
     }
 };
 
-struct MarketState {
-    double bestBid;
-    double bestAsk;
-    int bestBidQuantity;
-    double bestAskQuantity;
-};
 
 #endif

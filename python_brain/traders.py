@@ -37,6 +37,7 @@ class MomentumTrader:
 class Decision(BaseModel):
     model_config = ConfigDict(extra="forbid")
     decision: Literal["BUY", "SELL", "HOLD"]
+    price: float = Field(ge=0)
     quantity: int = Field(ge=0)
  
  
@@ -91,7 +92,7 @@ class AgenticTrader:
         response = client.chat.completions.create(
             model="openai/gpt-oss-20b",
             messages=[
-                {"role": "system", "content": "You are a trading agent that makes decisions based on market data. You will be provided with a context containing market statistics and the current state of the market. Your task is to analyze this information and make a decision to either BUY, SELL, or HOLD. Additionally, you must specify the quantity of the asset to trade, which should be a non-negative integer and MUST be less than or equal to the amount available. Please ensure that your response adheres strictly to the specified JSON schema."},
+                {"role": "system", "content": "You are a trading agent that makes decisions based on market data. You will be provided with a context containing market statistics and the current state of the market. Your task is to analyze this information and make a decision to either BUY, SELL, or HOLD. Additionally, you must specify the quantity of the asset to trade, which should be a non-negative integer and price to buy or sell for and MUST be less than or equal to the amount available. Please ensure that your response adheres strictly to the specified JSON schema."},
                 {"role": "user", "content": json.dumps(context)},
             ],
             response_format={

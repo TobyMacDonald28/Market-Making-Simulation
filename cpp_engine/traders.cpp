@@ -110,13 +110,17 @@ void AgenticTrader::makeDecision() {
     double cashBalance = getCash();
     int currentPosition = getPosition();
     
-    std::string action;
+    std::string decision;
+    int quantity;
+    double price;
+
     try {
         {
             py::gil_scoped_acquire gil;
 
-            action = py_bot.attr("make_decision")(marketState, cashBalance, currentPosition);
-            std::string action = py_signal.attr("decision").cast<std::string>();
+            py::object py_signal = py_bot.attr("make_decision")(marketState, cashBalance, currentPosition);
+            std::string decision = py_signal.attr("decision").cast<std::string>();
+            double price = py_signal.attr("price").cast<double>();
             int quantity = py_signal.attr("quantity").cast<int>();
         }
     }
@@ -128,36 +132,36 @@ void AgenticTrader::makeDecision() {
     }
         
 
-        if (action == "BUY") {
+        if (decision == "BUY") {
             if (quantity <= 0) {
                 std::cout << "[INFO] AgenticTrader " << traderID << " cannot afford to buy.\n";
                 return;
             }
-            Order newBuyOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, true, buyPrice, buyQuantity};
+            Order newBuyOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, true, price, quantity};
             orderBook.replaceOrder(prevBidId, newBuyOrder);
             prevBidId = newBuyOrder.orderId;
-        } else if (action == "SELL") {
+        } else if (decision == "SELL") {
             if (quantity <= 0) {
                 std::cout << "[INFO] AgenticTrader " << traderID << " has no stock to sell.\n";
                 return;
             }
-            Order newSellOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, false, sellPrice, sellQuantity};
+            Order newSellOrder = {static_cast<int>(orderBook.generateOrderID()), traderID, false, price, quantity};
             orderBook.replaceOrder(prevAskId, newSellOrder);
             prevAskId = newSellOrder.orderId;
         }
     
 }
 
-string AgenticTraderBot::lastStatus() {
+std::string AgenticTrader::lastStatus() {
     MarketState marketState = orderBook.getMarketState(traderID);
     double cashBalance = getCash();
     int currentPosition = getPosition();
-    string status;
+    std::string status;
     status += "Bot ID: " + std::to_string(traderID) + "\n";
     status += "Cash Balance: " + std::to_string(cashBalance) + "\n";
     status += "Current Position: " + std::to_string(currentPosition) + "\n";
-    status += "Previous Bid: " + std::to_string(getOrder(prevBidId).price) + " (Quantity: " + std::to_string(getOrder(prevBidId).quantity) + ")\n";
-    status += "Previous Ask: " + std::to_string(getOrder(prevAskId).price) + " (Quantity: " + std::to_string(getOrder(prevAskId).quantity) + ")\n";
+    status += "Previous Bid: " + std::to_string(orderBook.getOrder(prevBidId).price) + " (Quantity: " + std::to_string(orderBook.getOrder(prevBidId).quantity) + ")\n";
+    status += "Previous Ask: " + std::to_string(orderBook.getOrder(prevAskId).price) + " (Quantity: " + std::to_string(orderBook.getOrder(prevAskId).quantity) + ")\n";
 
     return status;
 }

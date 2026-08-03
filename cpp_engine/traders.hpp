@@ -9,15 +9,6 @@
 #include <random>
 namespace py = pybind11;
 
-PYBIND11_MODULE(engine_backend, m) {
-    
-    py::class_<MarketState>(m, "MarketState")
-        .def(py::init<>())
-        .def_readwrite("bestBid", &MarketState::bestBid)
-        .def_readwrite("bestAsk", &MarketState::bestAsk)
-        .def_readwrite("bestBidQuantity", &MarketState::bestBidQuantity)
-        .def_readwrite("bestAskQuantity", &MarketState::bestAskQuantity);
-}
 
 class Trader {
 protected:
@@ -102,11 +93,13 @@ class AgenticTrader : public Trader {
 private:
     py::object py_bot;
 public:
+    void makeDecision() override;
+    std::string lastStatus();
     AgenticTrader(int id, OrderBook& ob) : Trader(id, ob) {
         py::module_ sys = py::module_::import("sys");
         sys.attr("path").attr("append")("../python_brain");
         py::module_ mod = py::module_::import("traders");
         py_bot = mod.attr("AgenticTrader")();
     }
-}
+};
 #endif

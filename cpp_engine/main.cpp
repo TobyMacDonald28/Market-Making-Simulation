@@ -8,7 +8,6 @@
 
 #include "order_book.hpp"
 #include "traders.hpp"
-#include "agentic_trader_bot.hpp"
 
 namespace py = pybind11;
 
@@ -32,9 +31,9 @@ int main() {
 
 
     constexpr int NUM_AGENTIC_BOTS = 1;
-    std::vector<AgenticTraderBot*> agenticBots;  
+    std::vector<AgenticTrader*> agenticBots;  
     for (int i = 40; i < 40 + NUM_AGENTIC_BOTS; ++i) {
-        auto bot = std::make_unique<AgenticTraderBot>(i, centralExchange);
+        auto bot = std::make_unique<AgenticTrader>(i, centralExchange);
         agenticBots.push_back(bot.get());
         bots.push_back(std::move(bot));
     }
