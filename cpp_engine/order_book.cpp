@@ -10,15 +10,16 @@ void OrderBook::internalCancelOrder(int orderId){
     auto it = orderLookup.find(orderId);
     if (it != orderLookup.end()) {
         auto orderIt = it->second;
+        auto orderprice = orderIt->price;
         if (orderIt->isBuy) {
-            bids[orderIt->price].erase(orderIt);
-            if (bids[orderIt->price].empty()) {
-                bids.erase(orderIt->price);
+            bids[orderprice].erase(orderIt);
+            if (bids[orderprice].empty()) {
+                bids.erase(orderprice);
             }
         } else {
-            asks[orderIt->price].erase(orderIt);
-            if (asks[orderIt->price].empty()) {
-                asks.erase(orderIt->price);
+            asks[orderprice].erase(orderIt);
+            if (asks[orderprice].empty()) {
+                asks.erase(orderprice);
             }
         }
         orderLookup.erase(it);

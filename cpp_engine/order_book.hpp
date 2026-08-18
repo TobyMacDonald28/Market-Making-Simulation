@@ -88,12 +88,14 @@ public:
     MarketState getMarketState(int botId) {
         std::lock_guard<std::mutex> lock(bookMutex);
         MarketState state;
-        state.bestBid = getBestBid();
-        state.bestAsk = getBestAsk();
-        state.bestBidQuantity = getBestBidQuantity();
-        state.bestAskQuantity = getBestAskQuantity();
+        
+        state.bestBid = bids.empty() ? 0.0 : bids.begin()->first;
+        state.bestAsk = asks.empty() ? 999999.0 : asks.begin()->first;
+        state.bestBidQuantity = bids.empty() ? 0 : bids.begin()->second.front().quantity;
+        state.bestAskQuantity = asks.empty() ? 0 : asks.begin()->second.front().quantity;
+        
         return state;
-    }
+};
 
     Order getOrder(int orderId) {
         std::lock_guard<std::mutex> lock(bookMutex);

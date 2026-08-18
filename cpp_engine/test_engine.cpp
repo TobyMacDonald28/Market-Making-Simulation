@@ -39,8 +39,10 @@ void test_partial_fill() {
 void test_insufficient_funds() {
     OrderBook ob(100.0);
 
+    ob.getAccount(1).balance = 10000.0;
     ob.getAccount(1).stockQuantity = 100;
     ob.getAccount(2).balance = 50.0; // Not enough to buy 10 stocks at 100 each
+    ob.getAccount(2).stockQuantity = 0;
 
     ob.addOrder({101, 1, false, 100.0, 10});
 
@@ -55,9 +57,11 @@ void test_insufficient_funds() {
 
 void test_insufficient_stock() {
     OrderBook ob(100.0);
-
+    ob.getAccount(1).balance = 10000.0;
     ob.getAccount(1).stockQuantity = 5; // Only 5 stocks available
     ob.getAccount(2).stockQuantity = 0;
+    ob.getAccount(2).balance = 500.0; // Enough to buy 5 stocks at 100 each
+
 
     ob.addOrder({101, 1, false, 100.0, 10}); // Trying to sell 10 stocks
 

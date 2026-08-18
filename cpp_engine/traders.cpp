@@ -116,7 +116,7 @@ void AgenticTrader::makeDecision() {
         {
             py::gil_scoped_acquire gil;
 
-            py::object py_signal = py_bot.attr("make_decision")(marketState, cashBalance, currentPosition);
+            py::object py_signal = py_bot.attr("make_decision")(marketState, currentPosition, cashBalance);
             decision = py_signal.attr("decision").cast<std::string>();
             price = py_signal.attr("price").cast<double>();
             quantity = py_signal.attr("quantity").cast<int>();
@@ -153,11 +153,34 @@ std::string AgenticTrader::lastStatus() {
     double cashBalance = getCash();
     int currentPosition = getPosition();
     std::string status;
+    
     status += "Bot ID: " + std::to_string(traderID) + "\n";
     status += "Cash Balance: " + std::to_string(cashBalance) + "\n";
     status += "Current Position: " + std::to_string(currentPosition) + "\n";
-    status += "Previous Bid: " + std::to_string(orderBook.getOrder(prevBidId).price) + " (Quantity: " + std::to_string(orderBook.getOrder(prevBidId).quantity) + ")\n";
-    status += "Previous Ask: " + std::to_string(orderBook.getOrder(prevAskId).price) + " (Quantity: " + std::to_string(orderBook.getOrder(prevAskId).quantity) + ")\n";
+    
+    status += "Previous Bid: ";
+    if (prevBidId != -1) {
+        try {
+            Order bid = orderBook.getOrder(prevBidId);
+            status += std::to_string(bid.price) + " (Quantity: " + std::to_string(bid.quantity) + ")\n";
+        } catch (const std::runtime_error&) {
+            status += "Filled or Cancelled\n";
+        }
+    } else {
+        status += "None\n";
+    }
+
+    status += "Previous Ask: ";
+    if (prevAskId != -1) {
+        try {
+            Order ask = orderBook.getOrder(prevAskId);
+            status += std::to_string(ask.price) + " (Quantity: " + std::to_string(ask.quantity) + ")\n";
+        } catch (const std::runtime_error&) {
+            status += "Filled or Cancelled\n";
+        }
+    } else {
+        status += "None\n";
+    }
 
     return status;
 }

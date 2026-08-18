@@ -29,10 +29,10 @@ int main() {
     for (int i = 3; i < 9; ++i) {
         bots.push_back(std::make_unique<MomentumTrader>(i + 1, centralExchange));
     }
-    for (int i = 9; i < 40; ++i) {
+    
+    for (int i = 9; i < 10; ++i) {
         bots.push_back(std::make_unique<RandomTrader>(i + 1, centralExchange));
     }
-
 
     constexpr int NUM_AGENTIC_BOTS = 1;
     std::vector<AgenticTrader*> agenticBots;  
@@ -59,7 +59,7 @@ int main() {
             centralExchange.displayBook();
         } else if (command == "a") {
             for (auto* bot : agenticBots) {
-                std::cout << bot->lastStatus() << std::endl;
+                //std::cout << bot->lastStatus() << std::endl;
             }
         } else if (command == "exit") {
             running = false;

@@ -16,6 +16,7 @@ env.txt
 env
 .venv/
 .env/
+.env
 
 # Ignore compiled Python bytecode
 __pycache__/

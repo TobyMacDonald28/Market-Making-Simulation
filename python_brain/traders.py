@@ -49,12 +49,19 @@ class AgenticTrader:
         self.tick_history = deque(maxlen=self.lookback_window)
  
     def make_decision(self, market_state, current_position, current_cash):
-        self.tick_history.append(market_state)
+        state_dict = {
+            'best_bid': market_state.bestBid,
+            'best_ask': market_state.bestAsk,
+            'bid_volume': market_state.bestBidQuantity,
+            'ask_volume': market_state.bestAskQuantity
+        }
+        
+        self.tick_history.append(state_dict)
  
         if len(self.tick_history) < self.lookback_window:
             return Decision(decision="HOLD", price = 0, quantity=0)
  
-        df = pd.DataFrame(self.tick_history)
+        df = pd.DataFrame(list(self.tick_history))
  
         avgbidvol = df['bid_volume'].mean()
         avgaskvol = df['ask_volume'].mean()
